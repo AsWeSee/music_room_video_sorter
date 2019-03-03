@@ -29,7 +29,7 @@ def load_video_from_camera():
     frames_count = 0
     while True:
 
-        if os.path.isfile(paths.path + "\\end.txt"):
+        if os.path.isfile(paths.path_income + "end.txt"):
             cap.release()
             input_result_queue.put(True)
             break

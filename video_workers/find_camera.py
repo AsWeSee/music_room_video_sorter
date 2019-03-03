@@ -20,10 +20,10 @@ threads = []
 
 def check(ip1, ip2):
     ip = str(ip1) + '.' + str(ip2)
-    # print(ip)
+    #print(ip)
     try:
         urllib.request.urlopen(
-            'http://10.240.' + ip + ':13147/videostream.cgi?loginuse=' + camera_login + '&loginpas=' + camera_password,
+            'http://10.240.' + ip + ':17819/videostream.cgi?loginuse=' + camera_login + '&loginpas=' + camera_password,
             timeout=1)
     except HTTPError as error:
         print('Data not retrieved because %s\nURL: %s'.format(error, ip))
@@ -32,7 +32,7 @@ def check(ip1, ip2):
         return
 
     cap = cv2.VideoCapture(
-        'http://10.240.' + ip + ':13147/videostream.cgi?loginuse=' + camera_login + '&loginpas=' + camera_password)
+        'http://10.240.' + ip + ':17819/videostream.cgi?loginuse=' + camera_login + '&loginpas=' + camera_password)
     ret, frame = cap.read()
     cap.release()
     # brit = np.sum(frame)
@@ -59,13 +59,15 @@ def find_camera():
         if result[1] == True:
             return result[0]
 
+    print("find join")
     for t in threads:
         t.join()
+    print("find end")
     return None
 
 
 def form_http_connection_string(ip):
-    f = open("login_files\\camera_login_pass.txt")
+    f = open("camera_login_pass.txt")
     camera_str = f.read().split()
     camera_login = camera_str[0]
     camera_password = camera_str[1]
@@ -75,7 +77,7 @@ def form_http_connection_string(ip):
 
 
 def form_rtsp_connection_string(ip):
-    f = open("login_files\\camera_login_pass.txt")
+    f = open("camera_login_pass.txt")
     camera_str = f.read().split()
     camera_login = camera_str[0]
     camera_password = camera_str[1]
