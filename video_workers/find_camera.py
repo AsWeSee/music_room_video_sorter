@@ -5,11 +5,11 @@ import urllib
 from urllib.error import HTTPError, URLError
 import cv2
 
-# f = open("login_files\\camera_login_pass.txt")
-# camera_str = f.read().split()
-# camera_login = camera_str[0]
-# camera_password = camera_str[1]
-# f.close()
+f = open("camera_login_pass.txt")
+camera_str = f.read().split()
+camera_login = camera_str[0]
+camera_password = camera_str[1]
+f.close()
 
 ip_net_from = 17
 ip_net_to = 23
