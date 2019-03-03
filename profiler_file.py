@@ -1,4 +1,4 @@
 import cProfile
-import main
+import file_main
 
 cProfile.run('main')

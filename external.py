@@ -1,7 +1,7 @@
 import subprocess as sp
 import os
 
-command = ["python", 'main.py']
+command = ["python", 'file_main.py']
 
 #proc = sp.run(command, stdout=sp.PIPE, universal_newlines=True) # shell=True,
 

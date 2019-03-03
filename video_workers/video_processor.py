@@ -74,7 +74,7 @@ def check_motion(prev_image, image, counter):
     thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
     brit = np.sum(thresh)
     if counter % 100 == 0:
-        print("tresh " + str(brit))
+        print("treshold " + str(brit))
         if brit > 100000:
             cv2.imwrite("gray.jpg", gray)
             cv2.imwrite("GaussianBlur.jpg", gray)

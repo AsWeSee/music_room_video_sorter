@@ -10,11 +10,11 @@ from video_workers.queues import input_queue, input_result_queue
 from os import listdir
 from os.path import isfile, join
 
-path = "D:\\music room\\1 from camera"
+stored_ip = "10.240.17.168"
 
 def load_video_from_camera():
     print("start load")
-    paths = Paths("music room camera grabber")
+    paths = Paths("music room")
     cap = connect_to_camera()
 
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -26,7 +26,7 @@ def load_video_from_camera():
     print(height)
     print(fps)
 
-    count = 0
+    frames_count = 0
     while True:
 
         if os.path.isfile(paths.path + "\\end.txt"):
@@ -42,9 +42,9 @@ def load_video_from_camera():
             cap = connect_to_camera()
             continue
 
-        count +=1
-        if count % 100 == 0:
-            print("reader count " + str(count))
+        frames_count += 1
+        if frames_count % 100 == 0:
+            print("reader frames_count " + str(frames_count))
 
         while (input_queue.full()):
             print("reader sleep")
@@ -60,34 +60,35 @@ def connect_to_camera():
     none_count = 0
     while ip is None:
         time.sleep(100)
-        none_count +=1
+        none_count += 1
         print("ip is None " + str(none_count))
         ip = find_camera.find_camera()
     print("new ip " + ip)
+    stored_ip = ip
     connection_string = find_camera.form_rtsp_connection_string(ip)
     return cv2.VideoCapture(connection_string)
 
 
 def load_video_from_files():
 
-    filenames = [f for f in listdir(path) if isfile(join(path, f))]
-    filenum = 0
+    paths = Paths("music room")
+    filenames = [f for f in listdir(paths.path_income) if isfile(join(paths.path_income, f))]
+    filenames_count = len(filenames)
 
+    filenum = 0
     for file in filenames:
-        filenames_count = len(filenames)
         filenum += 1
-        print(file)
+        print("New file started to processing: " + file)
 
         start = time.time()
-        cap = cv2.VideoCapture(path + file)
+        cap = cv2.VideoCapture(paths.path_income + file)
         fps = cap.get(cv2.CAP_PROP_FPS)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float
         pixels = width * height
 
-        #cap = cv2.VideoCapture("rtsp://operator1:123412349qQ@10.240.16.11:10554/tcp/av0_0")
-        count = 0
 
+        frames_count = 0
         was_opened = False
         while(cap.isOpened()):
             was_opened = True
@@ -97,26 +98,24 @@ def load_video_from_files():
 
             ret, frame = cap.read()
 
-            count += 1
-
+            frames_count += 1
 
             if not ret:
                 end = time.time()
-                print("ret is none. count " + str(count))
+                print("ret is none. frames_count " + str(frames_count))
                 print("Time spended " + str(end - start))
-                print("fps: " + str(float(count)/(end - start)))
+                print("fps: " + str(float(frames_count)/(end - start)))
                 break
 
             input_queue.put(frame)
 
-            # if count % 100 == 0:
-                # print(file + " " + str(filenum) + " from " + str(filenames_count) + ". " + str(count) + " " + str(room_queue.qsize()))
+            if frames_count % 100 == 0:
+                print(file + " " + str(filenum) + " from " + str(filenames_count) + ". " + str(frames_count) + " " + str(input_queue.qsize()))
 
         cap.release()
         if was_opened:
-            os.rename(path + file, 'D:\\music room\\4_1 corrects' + file)
+            os.rename(paths.path_income + file, paths.path_corrects + file)
         else:
-            os.rename(path + file, 'D:\\music room\\4 error\\' + file)
+            os.rename(paths.path_income + file, paths.path_errors + file)
 
-
-    result.put(True)
+    input_result_queue.put(True)
